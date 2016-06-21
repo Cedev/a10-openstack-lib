@@ -12,6 +12,8 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+import validators
+
 EXTENSION = 'a10-device-instance'
 
 SERVICE = "A10_DEVICE_INSTANCE"
@@ -93,7 +95,7 @@ RESOURCE_ATTRIBUTE_MAP = {
                 'type:values': ['http', 'https']
             },
             'is_visible': True,
-            'convert_to': lambda attr: convert_to_lower,
+            'convert_to': lambda attr: validators.convert_to_lower,
             'default': lambda attr: attr.ATTR_NOT_SPECIFIED
         },
         'port': {
@@ -117,10 +119,3 @@ RESOURCE_ATTRIBUTE_MAP = {
         }
     }
 }
-
-
-def convert_to_lower(input):
-    try:
-        return input.lower()
-    except AttributeError:
-        return input

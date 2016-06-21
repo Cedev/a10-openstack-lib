@@ -1,5 +1,7 @@
 # Copyright (C) 2016 A10 Networks Inc. All rights reserved.
 
+import validators
+
 EXTENSION = 'a10-scaling-group'
 
 SERVICE = "A10_SCALING_GROUP"
@@ -155,7 +157,7 @@ RESOURCE_ATTRIBUTE_MAP = {
             'validate': {
                 'type:values': ['http', 'https']
             },
-            'convert_to': lambda attr: convert_to_lower,
+            'convert_to': lambda attr: validators.convert_to_lower,
             'is_visible': True,
             'default': lambda attr: attr.ATTR_NOT_SPECIFIED
         },
@@ -250,7 +252,7 @@ RESOURCE_ATTRIBUTE_MAP = {
                     'type:non_negative': None
                 }
             },
-            'convert_to': lambda attr: convert_nullable(attr.convert_to_int),
+            'convert_to': lambda attr: validators.convert_nullable(attr.convert_to_int),
             'is_visible': True,
             'default': lambda attr: attr.ATTR_NOT_SPECIFIED
         },
@@ -303,7 +305,7 @@ RESOURCE_ATTRIBUTE_MAP = {
                 'type:values': ['avg', 'min', 'max', 'sum']
             },
             'is_visible': True,
-            'convert_to': lambda attr: convert_to_lower,
+            'convert_to': lambda attr: validators.convert_to_lower,
             'default': 'avg'
         },
         'measurement': {
@@ -312,7 +314,7 @@ RESOURCE_ATTRIBUTE_MAP = {
             'validate': {
                 'type:values': ['connections', 'memory', 'cpu', 'interface']
             },
-            'convert_to': lambda attr: convert_to_lower,
+            'convert_to': lambda attr: validators.convert_to_lower,
             'is_visible': True
         },
         'operator': {
@@ -329,7 +331,7 @@ RESOURCE_ATTRIBUTE_MAP = {
             'validate': {
                 'a10_type:float': None
             },
-            'convert_to': lambda attr: convert_to_float,
+            'convert_to': lambda attr: validators.convert_to_float,
             'is_visible': True
         },
         'unit': {
@@ -338,7 +340,7 @@ RESOURCE_ATTRIBUTE_MAP = {
             'validate': {
                 'type:values': ['count', 'percentage', 'bytes']
             },
-            'convert_to': lambda attr: convert_to_lower,
+            'convert_to': lambda attr: validators.convert_to_lower,
             'is_visible': True
         },
         'period': {
@@ -356,7 +358,7 @@ RESOURCE_ATTRIBUTE_MAP = {
             'validate': {
                 'type:values': ['minute', 'hour', 'day']
             },
-            'convert_to': lambda attr: convert_to_lower,
+            'convert_to': lambda attr: validators.convert_to_lower,
             'is_visible': True
         }
     },
@@ -400,7 +402,7 @@ RESOURCE_ATTRIBUTE_MAP = {
             'validate': {
                 'type:values': ['scale-in', 'scale-out']
             },
-            'convert_to': lambda attr: convert_to_lower,
+            'convert_to': lambda attr: validators.convert_to_lower,
             'is_visible': True
         },
         'amount': {
@@ -415,52 +417,4 @@ RESOURCE_ATTRIBUTE_MAP = {
     }
 }
 
-
-def convert_to_lower(input):
-    try:
-        return input.lower()
-    except AttributeError:
-        return input
-
-
-def convert_to_float(input):
-    try:
-        return float(input)
-    except ValueError:
-        return input
-
-
-def convert_nullable(convert_value):
-    def f(input):
-        if input is not None:
-            return convert_value(input)
-        return None
-    return f
-
-
-def validate_float(data, options):
-    if not isinstance(data, float):
-        return "'%s' is not a number" % input
-
-
-def validate_reference(data, options):
-    """Referential integrity is enforced by the data model"""
-    return None
-
-
-def validate_nullable(validators):
-    def f(data, options):
-        if data is not None:
-            for rule in options:
-                value_validator = validators[rule]
-                reason = value_validator(data, options[rule])
-                if reason:
-                    return reason
-    return f
-
-
-VALIDATORS = {
-    'a10_type:float': lambda validators: validate_float,
-    'a10_type:reference': lambda validators: validate_reference,
-    'a10_type:nullable': validate_nullable
-}
+VALIDATORS = validators.VALIDATORS
